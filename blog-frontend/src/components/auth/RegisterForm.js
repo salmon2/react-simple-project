@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { changeField, initializeForm, register } from '../../modules/auth';
@@ -6,6 +6,7 @@ import { changeField, initializeForm, register } from '../../modules/auth';
 import AuthForm from './AuthForm';
 
 const RegisterForm = () => {
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const { form, auth, authError, user } = useSelector(({ auth, user }) => ({
     form: auth.register,
@@ -28,8 +29,19 @@ const RegisterForm = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     const { username, password, passwordConfirm } = form;
+    if ([username, password, passwordConfirm].includes('')) {
+      setError('빈 칸을 모두 입력하세요');
+      return;
+    }
+
     if (password !== passwordConfirm) {
       //TODO: 오류처리
+      setError('비밀번호가 일치하지 않습니다.');
+      dispatch(changeField({ form: 'register', key: 'password', value: '' }));
+      dispatch(
+        changeField({ form: 'register', key: 'passwordConfirm', value: '' })
+      );
+
       return;
     }
     dispatch(register({ username, password }));
@@ -55,9 +67,13 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (user) {
-      console.log('check API 성공');
-      console.log(user);
       navigate('/'); //홈화면으로 이동
+
+      try {
+        localStorage.setItem('user', JSON.stringfy(user));
+      } catch (e) {
+        console.log('localStorage is not working');
+      }
     }
   }, [navigate, user]);
 
@@ -67,6 +83,7 @@ const RegisterForm = () => {
       form={form}
       onChange={onChange}
       onSubmit={onSubmit}
+      error={error}
     ></AuthForm>
   );
 };

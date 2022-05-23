@@ -11,6 +11,9 @@ import { Provider } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
+
+import { tempSetUser, check } from './modules/user';
+
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const logger = createLogger();
@@ -21,10 +24,23 @@ const store = createStore(
   rootReducer,
   composeEnhancer(applyMiddleware(logger, ReduxThunk, sagaMiddleware))
 );
+function loadUser() {
+  try {
+    const user = localStorage.getItem('user');
+    if (!user) return; //로그인 상태가 아니라면 아무것도 하지 않는다.
+    store.dispatch(tempSetUser(JSON.parse(user)));
+    store.dispatch(check());
+  } catch (e) {
+    console.log('localStorage is not working');
+  }
+}
+
+loadUser();
 
 sagaMiddleware.run(rootSaga);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <Provider store={store}>
     <BrowserRouter>
