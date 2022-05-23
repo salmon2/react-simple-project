@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { changeField, initializeForm, login } from '../../modules/auth';
+import AuthForm from '../../components/auth/AuthForm';
+import { check } from '../../modules/user';
 import { useNavigate } from 'react-router-dom';
-import { changeField, initializeForm, register } from '../../modules/auth';
 
-import AuthForm from './AuthForm';
-
-const RegisterForm = () => {
+const LoginForm = ({ history }) => {
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { form, auth, authError, user } = useSelector(({ auth, user }) => ({
-    form: auth.register,
+    form: auth.login,
     auth: auth.auth,
     authError: auth.authError,
     user: user.user,
@@ -19,7 +21,7 @@ const RegisterForm = () => {
     const { value, name } = e.target;
     dispatch(
       changeField({
-        form: 'register',
+        form: 'login',
         key: name,
         value,
       })
@@ -28,49 +30,32 @@ const RegisterForm = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const { username, password, passwordConfirm } = form;
-    if ([username, password, passwordConfirm].includes('')) {
-      setError('빈 칸을 모두 입력하세요');
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      //TODO: 오류처리
-      setError('비밀번호가 일치하지 않습니다.');
-      dispatch(changeField({ form: 'register', key: 'password', value: '' }));
-      dispatch(
-        changeField({ form: 'register', key: 'passwordConfirm', value: '' })
-      );
-
-      return;
-    }
-    dispatch(register({ username, password }));
+    const { username, password } = form;
+    dispatch(login({ username, password }));
   };
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    dispatch(initializeForm('register'));
+    dispatch(initializeForm('login'));
   }, [dispatch]);
 
   useEffect(() => {
     if (authError) {
       console.log('오류 발생');
       console.log(authError);
+      setError('로그인 실패');
       return;
     }
     if (auth) {
-      console.log('회원가입 성공');
-      console.log(auth);
+      console.log('로그인 성공');
+      dispatch(check());
     }
   }, [auth, authError, dispatch]);
 
   useEffect(() => {
     if (user) {
-      navigate('/'); //홈화면으로 이동
-
+      navigate('/');
       try {
-        localStorage.setItem('user', JSON.stringfy(user));
+        localStorage.setItem('user', JSON.stringify(user));
       } catch (e) {
         console.log('localStorage is not working');
       }
@@ -79,7 +64,7 @@ const RegisterForm = () => {
 
   return (
     <AuthForm
-      type="register"
+      type="login"
       form={form}
       onChange={onChange}
       onSubmit={onSubmit}
@@ -88,4 +73,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default LoginForm;

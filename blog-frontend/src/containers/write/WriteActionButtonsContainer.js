@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import WriteActionButtons from './WriteActionButtons';
+import WriteActionButtons from '../../components/write/WriteActionButtons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { writePost } from '../../modules/write';

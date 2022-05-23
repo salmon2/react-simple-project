@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import React from 'react';
-import Editor from './Editor';
+import Editor from '../../components/write/Editor';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeField, initialize } from '../../modules/write';
 
