@@ -125,15 +125,17 @@ export const list = async (ctx) => {
     ...(tag ? { tags: tag } : {}),
   };
 
+  const limitSize = 3;
+
   try {
     const posts = await Post.find(query)
       .sort({ _id: -1 })
-      .limit(10)
-      .skip((page - 1) * 10)
+      .limit(limitSize)
+      .skip((page - 1) * limitSize)
       .lean()
       .exec();
     const postCount = await Post.countDocuments(query).exec();
-    ctx.set('Last-Page', Math.ceil(postCount / 10));
+    ctx.set('Last-Page', Math.ceil(postCount / limitSize));
     ctx.body = posts.map((post) => ({
       ...post,
       body: removeHtmlAndShorten(post.body),

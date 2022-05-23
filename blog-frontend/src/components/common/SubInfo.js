@@ -1,9 +1,13 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import palette from '../../lib/styles/palette';
 import { Link } from 'react-router-dom';
 
 const SubInfoBlock = styled.div`
-  ${(props) => props.hasMarginTop && CSS`margin-top: 1rem;`}
+  ${(props) =>
+    props.hasMarginTop &&
+    css`
+      margin-top: 1rem;
+    `}
 
   /* margin-top: 1rem; */
   color: ${palette.gray[6]};
